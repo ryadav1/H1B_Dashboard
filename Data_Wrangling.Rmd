@@ -1,0 +1,596 @@
+---
+title: "Collect Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+### import all the necessary libraries
+
+library(readxl)
+library(dplyr)
+library(gdata)
+library(stringr)
+library(DT)
+library(data.table)
+library(readr)
+library(tidyr)
+```
+
+
+
+```{r}
+### Import the datasets for years 2011 - 2018
+### Specify the col_types argument so it can be done faster
+### Filter only for those observations that were certified (these are the majority of the applications, there might be a lot of errors in those that were not)
+### Add an NA zipcode and worksite county to the files that do not have them
+### Rename the coloumn names so they are the same in all of the files 
+
+FY11_Q4_H1B <- read_excel("/home/stat041s18_h1b/DataFiles/H1B_FY11_Q4.xlsx",  col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "text", "text", "text", "numeric", "numeric", "text", "text", "numeric", "text", "text", "numeric", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank",  "blank", "blank", "blank", "numeric")) %>%
+      filter(STATUS == "CERTIFIED") %>%
+      mutate("WORKSITE_POSTAL_CODE" = NA) %>%
+      mutate("WORKSITE_COUNTY" = NA) %>%
+      rename("CASE_STATUS" = "STATUS", "EMPLOYMENT_START_DATE" = "LCA_CASE_EMPLOYMENT_START_DATE", "EMPLOYER_NAME" = "LCA_CASE_EMPLOYER_NAME", "SOC_CODE" = "LCA_CASE_SOC_CODE", "SOC_NAME" = "LCA_CASE_SOC_NAME", "JOB_TITLE" = "LCA_CASE_JOB_TITLE", "WAGE_RATE_FROM" = "LCA_CASE_WAGE_RATE_FROM", "WAGE_RATE_TO" = "LCA_CASE_WAGE_RATE_TO", "WAGE_UNIT_OF_PAY" = "LCA_CASE_WAGE_RATE_UNIT", "WORKSITE_CITY" = "LCA_CASE_WORKLOC1_CITY", "WORKSITE_STATE" = "LCA_CASE_WORKLOC1_STATE", "PREVAILING_WAGE" = "PW_1", "PW_UNIT_OF_PAY" = "PW_UNIT_1", "NAICS_CODE" = "LCA_CASE_NAICS_CODE")
+
+FY12_Q4_LCA <- read_excel("/home/stat041s18_h1b/DataFiles/LCA_FY12_Q4.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "text", "text", "text", "numeric", "numeric", "text", "text", "numeric", "text", "text", "numeric", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "numeric")) %>%
+      filter(STATUS == "CERTIFIED") %>%
+      mutate("WORKSITE_POSTAL_CODE" = NA) %>%
+      mutate("WORKSITE_COUNTY" = NA) %>%
+      rename("CASE_STATUS" = "STATUS", "EMPLOYMENT_START_DATE" = "LCA_CASE_EMPLOYMENT_START_DATE", "EMPLOYER_NAME" = "LCA_CASE_EMPLOYER_NAME", "SOC_CODE" = "LCA_CASE_SOC_CODE", "SOC_NAME" = "LCA_CASE_SOC_NAME", "JOB_TITLE" = "LCA_CASE_JOB_TITLE", "WAGE_RATE_FROM" = "LCA_CASE_WAGE_RATE_FROM", "WAGE_RATE_TO" = "LCA_CASE_WAGE_RATE_TO", "WAGE_UNIT_OF_PAY" = "LCA_CASE_WAGE_RATE_UNIT", "WORKSITE_CITY" = "LCA_CASE_WORKLOC1_CITY", "WORKSITE_STATE" = "LCA_CASE_WORKLOC1_STATE", "PREVAILING_WAGE" = "PW_1", "PW_UNIT_OF_PAY" = "PW_UNIT_1", "NAICS_CODE" = "LCA_CASE_NAICS_CODE")
+
+FY13_Q4_LCA <- read_excel("/home/stat041s18_h1b/DataFiles/LCA_FY13_Q4.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "text", "text", "text", "numeric", "text", "text", "text", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "text")) %>%
+      filter(STATUS == "CERTIFIED") %>%
+      mutate("WORKSITE_POSTAL_CODE" = NA) %>%
+      mutate("WORKSITE_COUNTY" = NA) %>%
+      rename("CASE_STATUS" = "STATUS", "EMPLOYMENT_START_DATE" = "LCA_CASE_EMPLOYMENT_START_DATE", "EMPLOYER_NAME" = "LCA_CASE_EMPLOYER_NAME", "SOC_CODE" = "LCA_CASE_SOC_CODE", "SOC_NAME" = "LCA_CASE_SOC_NAME", "JOB_TITLE" = "LCA_CASE_JOB_TITLE", "WAGE_RATE_FROM" = "LCA_CASE_WAGE_RATE_FROM", "WAGE_RATE_TO" = "LCA_CASE_WAGE_RATE_TO", "WAGE_UNIT_OF_PAY" = "LCA_CASE_WAGE_RATE_UNIT", "WORKSITE_CITY" = "LCA_CASE_WORKLOC1_CITY", "WORKSITE_STATE" = "LCA_CASE_WORKLOC1_STATE", "PREVAILING_WAGE" = "PW_1", "PW_UNIT_OF_PAY" = "PW_UNIT_1", "NAICS_CODE" = "LCA_CASE_NAICS_CODE")
+
+FY14_Q4_H1B <- read_excel("/home/stat041s18_h1b/DataFiles/H1B_FY14_Q4.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "text", "text", "text", "numeric", "text", "text", "text", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "text")) %>%
+      filter(STATUS == "CERTIFIED") %>%
+      mutate("WORKSITE_POSTAL_CODE" = NA) %>%
+      mutate("WORKSITE_COUNTY" = NA) %>%
+      rename("CASE_STATUS" = "STATUS", "EMPLOYMENT_START_DATE" = "LCA_CASE_EMPLOYMENT_START_DATE", "EMPLOYER_NAME" = "LCA_CASE_EMPLOYER_NAME", "SOC_CODE" = "LCA_CASE_SOC_CODE", "SOC_NAME" = "LCA_CASE_SOC_NAME", "JOB_TITLE" = "LCA_CASE_JOB_TITLE", "WAGE_RATE_FROM" = "LCA_CASE_WAGE_RATE_FROM", "WAGE_RATE_TO" = "LCA_CASE_WAGE_RATE_TO", "WAGE_UNIT_OF_PAY" = "LCA_CASE_WAGE_RATE_UNIT", "WORKSITE_CITY" = "LCA_CASE_WORKLOC1_CITY", "WORKSITE_STATE" = "LCA_CASE_WORKLOC1_STATE", "PREVAILING_WAGE" = "PW_1", "PW_UNIT_OF_PAY" = "PW_UNIT_1", "NAICS_CODE" = "LCA_CASE_NAICS_CODE")
+
+FY15_Q4_H1B <- read_excel("/home/stat041s18_h1b/DataFiles/H1B_FY15_Q4.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "guess", "blank", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "text", "text", "guess", "text", "blank", "blank", "blank", "blank", "text", "text", "blank", "blank", "text", "text", "text", "text")) %>%
+      filter(CASE_STATUS == "CERTIFIED") %>%
+      separate(WAGE_RATE_OF_PAY, c("WAGE_RATE_FROM", "WAGE_RATE_TO"), sep = " -", convert = TRUE) %>%
+      mutate(WAGE_RATE_TO = as.numeric(WAGE_RATE_TO)) %>%
+      mutate(WAGE_RATE_FROM = as.numeric(WAGE_RATE_FROM)) %>%
+      rename("FULL_TIME_POS" = "FULL_TIME_POSITION", "NAICS_CODE" = "NAIC_CODE", "TOTAL_WORKERS" = "TOTAL WORKERS") %>%
+      mutate(EMPLOYMENT_START_DATE = as.Date(EMPLOYMENT_START_DATE, "%m/%d/%Y"))
+
+FY16_Q4_H1B <- read_excel("/home/stat041s18_h1b/DataFiles/H1B_FY16_Q4.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "blank", "blank", "blank", "numeric", "numeric", "text", "blank", "blank", "text", "text", "text", "text", "blank")) %>%
+      filter(CASE_STATUS == "CERTIFIED") %>%
+      rename("FULL_TIME_POS" = "FULL_TIME_POSITION", "NAICS_CODE" = "NAIC_CODE", "WAGE_RATE_FROM" = "WAGE_RATE_OF_PAY_FROM", "WAGE_RATE_TO" = "WAGE_RATE_OF_PAY_TO")
+
+FY17_Q4_H1B <- read_excel("/home/stat041s18_h1b/DataFiles/H1B_FY17_Q4.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "numeric", "blank", "blank", "blank", "blank", "blank", "blank", "text", "numeric", "text", "blank", "blank", "blank", "blank", "numeric", "numeric", "text", "blank", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "blank")) %>%
+      filter(CASE_STATUS == "CERTIFIED") %>%
+      rename("FULL_TIME_POS" = "FULL_TIME_POSITION", "WAGE_RATE_FROM" = "WAGE_RATE_OF_PAY_FROM", "WAGE_RATE_TO" = "WAGE_RATE_OF_PAY_TO")
+
+FY18_Q1_H1B <- read_excel("/home/stat041s18_h1b/DataFiles/H1B_FY18_Q1.xlsx", col_types = c("blank", "text", "blank", "blank", "text", "date", "blank", "text", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "numeric", "blank", "blank", "blank", "blank", "blank", "blank", "text", "numeric", "text", "blank", "blank", "blank", "blank", "numeric", "numeric", "text", "blank", "blank", "blank", "blank", "blank", "text", "text", "text", "text", "blank")) %>%
+      filter(CASE_STATUS == "CERTIFIED") %>%
+      rename("FULL_TIME_POS" = "FULL_TIME_POSITION", "WAGE_RATE_FROM" = "WAGE_RATE_OF_PAY_FROM", "WAGE_RATE_TO" = "WAGE_RATE_OF_PAY_TO")
+
+```
+
+```{r}
+### Bind together the datasets we just imported and ensure that the classes are correct
+
+MERGED_H1B <- rbind(FY11_Q4_H1B, FY12_Q4_LCA, FY13_Q4_LCA, FY14_Q4_H1B, FY15_Q4_H1B, FY16_Q4_H1B, FY17_Q4_H1B, FY18_Q1_H1B) %>%
+      mutate(WAGE_RATE_FROM = as.numeric(WAGE_RATE_FROM)) %>%
+      mutate(WAGE_RATE_TO = as.numeric(WAGE_RATE_TO)) %>%
+      mutate(WAGE_RATE_TO = unknownToNA(WAGE_RATE_TO, 0)) %>%
+      mutate(TOTAL_WORKERS = as.integer(TOTAL_WORKERS)) %>%
+      mutate(PREVAILING_WAGE = as.numeric(PREVAILING_WAGE)) %>%
+      select(-CASE_STATUS)
+
+### Export the dataset once, so that we do not have to go throught he ardous of importing and merging again (since the original data will not change)
+
+write.csv(MERGED_H1B, "/home/stat041s18_h1b/MergedData.csv")
+
+```
+
+```{r}
+### Import the recently exported document, and start to wrangle the data
+
+MERGED_H1B <- read_csv("/home/stat041s18_h1b/MergedData.csv")
+
+### Change all cells to uppercase (as most but not all columns already are capitalized)
+
+MERGED_H1B <- MERGED_H1B %>%
+      mutate_all(funs(toupper))
+
+### Change '&' symbol to AND in the employer name column
+
+to_and <- str_replace_all(MERGED_H1B$EMPLOYER_NAME, "\\&", "AND")
+
+MERGED_H1B <- MERGED_H1B %>%
+      mutate(EMPLOYER_NAME = to_and)
+
+### Delete certain endings from employers as it is not used consistently
+remove_dot <- str_replace_all(MERGED_H1B$EMPLOYER_NAME, "\\.", "")
+MERGED_H1B <- MERGED_H1B %>%
+      mutate(EMPLOYER_NAME = remove_dot)
+remove_word <- paste(c("INC$", "LLC$", "LLP$", "LP$", "CO$", ","), collapse = "|")
+clean_employer_name <- str_replace_all(MERGED_H1B$EMPLOYER_NAME, remove_word, "")
+
+MERGED_H1B <- MERGED_H1B %>%
+      mutate(EMPLOYER_NAME = clean_employer_name)
+
+### Remove leading and/or trailing whitespace from character strings
+
+spaced_employer_name <- trimws(MERGED_H1B$EMPLOYER_NAME, "both") 
+
+MERGED_H1B <- MERGED_H1B %>%
+      mutate(EMPLOYER_NAME = spaced_employer_name)
+
+### Remove punctuations from the job title, changed SR and JR to Senior and Junior respectively, change '&' smybol to AND string
+
+change_to_and <- str_replace_all(MERGED_H1B$JOB_TITLE, "\\&", " AND ")
+job_dot <- str_replace_all(change_to_and, "\\.", "")
+MERGED_H1B <- MERGED_H1B %>%
+      mutate(JOB_TITLE = job_dot)
+
+MERGED_H1B$JOB_TITLE <- str_replace_all(MERGED_H1B$JOB_TITLE, "^SR$", "SENIOR") 
+MERGED_H1B$JOB_TITLE <- str_replace_all(MERGED_H1B$JOB_TITLE, "^JR$", "JUNIOR")
+
+spaced_job_title <- trimws(MERGED_H1B$JOB_TITLE, "both")
+
+### Data has some interesting US territories like "MP" for Northern Mariana Islands, "PW" for Palau, "MH" for Marshal Islands, "AS" - American Samoa, 
+### "FM" for Micronesia, "GU" for Guam, "PR" for Puerto Rico which we remove to only have DC and the 50 US states
+
+states_abbr <- c(state.abb, "DC")
+original_states <- unique(MERGED_H1B$WORKSITE_STATE)
+MERGED_H1B <- MERGED_H1B %>%
+      filter(WORKSITE_STATE %in% states_abbr)
+
+```
+
+
+```{r}
+### Change all the mistakes that are a result of typing errors of SOC codes (most of the mistakes were found through trial and error)
+
+MERGED_H1B <- MERGED_H1B %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = ".00$", replacement = "")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = ".0$", replacement = "")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "(\\d{2})(\\d{4})", "\\1-\\2")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "(\\d{2})=(\\d{4})", "\\1-\\2")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "(\\d{2})-(\\d{4}).$", "\\1-\\2")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "(\\d{2}) - (\\d{4})", "\\1-\\2")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "(\\d{2})--(\\d{4})", "\\1-\\2")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "(\\d{2})-\\s?(\\d{4})", "\\1-\\2")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-1011.02", "11-1011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^40848$", "11-2011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^44501$", "11-2021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^44866$", "11-2022")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^48153$", "11-2031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^4060$", "11-3011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^11-321$", "11-3021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-3031.01|11-1031.02|11-3031.02", "11-1031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-3051.01", "11-3051")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-3071.01|11-3071.02|11-3071.03|^26238$", "11-3071")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-9011.01|11-9013.02|11-9013.03|11-9011.03|11-9011.02|^41591$", "11-9013")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^11994$", "11-9032")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^12359$", "11-9033")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-9039.02|11-9039.99|^145$", "11-9039")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^29891$", "11-9081")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-9121.01", "11-9121")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-3049.99", "11-3121")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-9199.01|11-9199.02|11-9199.03|11-9199.04|11-9199.06|11-9199.08|11-9199.99|^36465$", "11-9199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1031.01|13-1031.02", "13-1031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1041.01|13-1041.02|13-1041.03|13-1041.06|13-1041.07|13.1041.07", "13-1041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1071.01|13-1071.02|13-1071-02|13-1071.99|13-1079.99|13-2071.02|^13-10$", "13-1071")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1081.01|13-1081.02|13.1081.02|^13-181.01$", "13-1081")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, ":13-1111|^13-111$|^13.111$|^13.1111$", "13-1111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^113-1161$|^13-161$|^13-1611$|^13-161$|^13-1611$", "13-1161")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1199.01|13-1199.02|13-1199.03|13-1199.04|13-1199.05|13-1199.99", "13-1199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-2011-01|13-2011.01|13-2011.02|^35644$|^13-2111$", "13-2011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-2021.02", "13-2021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-2099.01|13-2099.02|13-2099.04|13-2099.99", "13-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "115-1111", "15-1111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1071.01", "15-1122")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1099-01|15-1099.01|15-1099-08|15-1099.02|15-1099.05|15-1099.06|15-1099.07|15-1099.08|15-1099.09|15-1099.11|15-1099.13|15-1099.14|15-1099.2|15-1099.99|15-1031.99|15-1191.01|15-1192.02|15-1199-01|15-1199-02|15-1199.01|15-1199.02|15.1199.02|15-1199.03|15-1199.04|15-1199.05|15-1199.06|15.1199.06|15-1199.07|15-1199.08|15.1199.09|15-1199.09|15-1199.11|15-1199.12|15-1199.9|15-1799.01|15-1799.01|15-1799.02|15-1799.04|15-1799.09|15-1799.11|15-199.02|15-1990.09|15-1990.1|15-119.09|15-119.08|15-119.01|1511.01|15/1199.01|15.1199.01|11-1199.01", "15-1199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1099.03", "15-1143")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1099.04", "15-1134")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1121.01|15/1121|19124|^272$|^311$|^35084$|^35614$|^36084$|^380$|^403$|^419$|^460$|^47894$|^73104$|^734$|^11244$|^120$|^15-112$|^167$|^16974$|^181$|^197$
+                                    ^220$", "15-1121")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1132.15|1-1132|18850 N 56TH ST", "15-1132")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15.11-3300000000001", "15-1133")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15.11-3099999999999", "15-1131")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1143.01", "15-1143")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-11-9930", "15-1199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-2013.1", "15-2031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-2041.01|15-2041.02", "15-2041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-2099.99", "15-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-1011.01|^17-011$", "17-1011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2051.01|14-2051.01", "17-2051")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2081.01", "17-2081")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2111.01|17-2111.02|17-2111.03|17.21-1099999999998", "17-2111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2112.01", "17-2112")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2121.01|17-2121.02", "17-2121")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2141.01|17-2141.02", "17-2141")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2199.01|17-2199.02|17-2199.03|17-2199.04|17-2199.05|17-2199.07|17-2199.08|17-2199.09|17-2199.11|17-2199.99|17.2199.02|17.2199.04|17.2199.06", "17-2199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-3011.01|17-3011.02", "17-3011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-3012.01|17-3012.02", "17-3012")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-3019.99", "17-3019")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-3023.01|17-3023.02|17-3023.03", "17-3023")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-3029.01|17-3029.02|17-3029.03|17-3029.04|17-3029.05|17-3029.07|17-3029.06|17-3029.11|17-3029.99", "17-3029")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-1013.01|19-1013.02", "19-1013")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-1020.01|19-1029.01|19-1029.02|19-1029.03|19-1029.99|19.1029.01", "19-1029")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-1021.01|19-1021.02", "19-1021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-1031.01|19-1021.02|19-1031.02", "19-1031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-1099.99", "19-1099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-2042.01", "19-2042")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-2099.01|19-2099.99", "19-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-3011.01", "19-3011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-3031.01|19-3031.02|19-3031.03", "19-3031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-3039.99", "19-3039")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-3091.01|19-3091.02", "19-3091")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-3099.01|19-3099.99", "19-3099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-4011.01|19-4011.02", "19-4011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-4041.01|19-4041.02", "19-4041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-4041.01|19-4041.02", "19-4041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-4061.01", "19-4061")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-4099.01|19-4099.99", "19-4099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "21-1019.99", "21-1019")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "21-1029.99", "21-1029")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "21-1099.99", "21-1099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "21-2099.99", "21-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "23-2099.99", "23-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-1069.99", "25-1069")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-1199.99", "25-1199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-3099.02|25-3099.99", "25-3099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-3099.02|25-3099.99", "25-3099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25/1071", "25-1071")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^25-90$|25-9031.01", "25-9031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-9099.99", "25-9099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^26048$", "11-9031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-1013.01|27-1013.04", "27-1013")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-1019.99", "27-1019")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^245$", "27-1024")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-1027.01|27-1027.02", "27-1027")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-1029.99", "27-1029")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-2012.01|27-2012.02|27-2012.03|27-2012.04|27-2012.05|27-2012.3", "27-2012")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-2041.01|27-2041.03", "27-2041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-2042.02", "27-2042")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-2099.99", "27-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^27-30$", "27-3022")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-3043.01|27-3043.02|27-3043.04|27-3043.05", "27-3043")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-3099.99", "27-3099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-4021.01", "27-4021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "27-4099.99", "27-4099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^29-10$", "29-1021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-1029.99", "29-1029")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-1063.03|29-1069.03|29-1069.04|29-1069.06|29-1069.07|29-1069.12|29-1069.99|29.1069.03|29.1069.99", "29-1069")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-1129.99", "29-1129")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-1141.04", "29-1141")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-1199.01|29-1199.05|29-1199.99|29.11-9900000000001", "29-1199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-2034.01", "29-2034")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-2099.99", "29-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "^29-90$", "29-9011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-9099.99", "29-9099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "31-9099.01|31-9099.99", "31-9099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "33-1099.99", "31-1099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "37-1011.01", "37-1011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "37-1012.01|37-1012.02", "37-1012")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "41-3031..01|41-3031.01|41-3031.02|41-3031.03", "41-3031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "41-3099.01|41-3099.99", "41-3099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "41-4011.02|41-4011.03|41-4011.04|41-4011.05|41-4011.06", "41-4011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "41-9099.99", "41-9099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "43-1011.01|43-1011.02", "43-1011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "43-3021.02", "43-3021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "43-4051.03", "43-4051")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "43-5081.03", "43-5081")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "43-9041.02", "43-9041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "43-9111.01|43.9111.01", "43-9111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "45-1011.01|45-1011.02|45-1011.03|45-1011.04|45-1011.05|45-1011.06|45-1011.08", "43-9111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "45-2099.99", "45-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "47-1011.01", "47-1011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "47-2073.02", "47-2073")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "47-4099.99", "47-4099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "49-2022.04", "49-2022")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "49-3011.01|49-3011.02", "49-3011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "49-3023.01|49-3023.02", "49-3023")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "49-9021.02", "49-9021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "51-3011.01", "51-3011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "51-6099.99", "51-6099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "51-9061.01", "51-9061")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "51-9071.01|51-9071.06", "51-9071")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "51-9131.01", "51-9151")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "51-9199.99", "51-9199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "53-5011.01", "53-5011")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "53-5021.01", "53-5021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "53-6051.01", "53-6051")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "53-6051.01|53-6051.03|53-6051.06|53-6051.08", "53-6051")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "53-6099.99", "53-6099"))
+
+### Change the remaining questionable SOC_CODEs based on the SOC_NAME column (as both follow the same method of categorization they should be consistent)
+
+SOC_Pattern = "([0-9]{2}[-][0-9]{4})"
+init <- unique(str_extract(string = MERGED_H1B$SOC_CODE, pattern = SOC_Pattern))
+all <- unique(MERGED_H1B$SOC_CODE)
+problematic <- sort(all[!all %in% init])
+
+MERGED_H1B2 <- MERGED_H1B %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, pattern = "^(\\d{2}).(\\d{4})$", "\\1-\\2")) %>%
+      mutate(SOC_CODE_PROBLEM = ifelse(SOC_CODE %in% problematic, 1, 0)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER AND INFORMATION SYSTEMS MANAGERS", "11-3021", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "MARKETING MANAGERS", "11-2021", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER SUPPORT SPECIALISTS", "15-1151", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER SUPPORT SPECIALIST", "15-1151", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "FINANCIAL MANAGERS", "11-3031", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "ARCHITECTURAL AND ENGINEERING MANAGERS", "11-9041", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "SALES MANAGERS", "11-2022", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "MEDICAL AND HEALTH SERVICES MANAGERS", "11-9111", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "INDUSTRIAL PRODUCTION MANAGERS", "11-3051", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "PURCHASING MANAGERS", "11-3061", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "ADVERTISING AND PROMOTIONS MANAGERS", "11-2011", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "FOOD SERVICE MANAGERS", "11-9051", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "CONSTRUCTION MANAGERS", "11-9021", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "HUMAN RESOURCES MANAGERS", "11-3121", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "SOCIAL AND COMMUNITY SERVICE MANAGERS", "11-9151", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "ADMINISTRATIVE SERVICES MANAGERS", "11-3011", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "PUBLIC RELATIONS AND FUNDRAISING MANAGERS", "11-2031", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "NATURAL SCIENCES MANAGERS", "11-9121", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "TRAINING AND DEVELOPMENT MANAGERS", "11-3131", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "BIOLOGICAL SCIENTISTS", "19-1029", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "EDUCATION ADMINISTRATORS, PRESCHOOL AND CHILDCARE", "11-9031", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "PROPERTY, REAL ESTATE, AND COMMUNITY ASSOCIATION M", "11-9141", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPENSATION AND BENEFITS MANAGERS", "11-3111", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "EMERGENCY MANAGEMENT DIRECTORS", "11-9161", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "15-1121", "15-1121", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "AGRICULTURAL AND FOOD SCIENTISTS", "19-4011", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "OFFICE AND ADMINISTRATIVE SUPPORT WORKERS, ALL OTH", "43-9199", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "15-1132", "15-1132", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "15-1199", "15-1199", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "17-2071", "17-2071", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "17-2141", "17-2141", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "17-2199", "17-2199", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER NETWORK SUPPORT SPECIALISTS 15-1152", "15-1152", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER OCCUPATIONS, ALL OTHER", "15-1199", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "INFORMATION TECHNOLOGY PROJECT MANAGERS", "15-1199", SOC_CODE)) %>%      
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER PROGRAMMERS", "15-1131", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER SYSTEMS ANALYST", "15-1121", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "COMPUTER SYSTEMS ANALYSTS", "15-1121", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "INDUSTRIAL ENGINEERS", "17-2112", SOC_CODE)) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE_PROBLEM == 1 & SOC_NAME == "TRAINING AND DEVELOPMENT SPECIALISTS", "13-1151", SOC_CODE))
+
+SOC_Pattern = "([0-9]{2}[-][0-9]{4})"
+init2 <- unique(str_extract(string = MERGED_H1B2$SOC_CODE, pattern = SOC_Pattern))
+all2 <- unique(MERGED_H1B2$SOC_CODE)
+problematic2 <- sort(all2[!all2 %in% init2])
+
+MERGED_H1B2 <- MERGED_H1B2 %>%
+      mutate(SOC_CODE_PROBLEM = ifelse(SOC_CODE %in% problematic2, 1, 0)) 
+
+### Import new dataset with the official codes and titles for SOC
+
+soc_official <- read_excel("/home/stat041s18_h1b/soc_structure_2010.xls", sheet = "Sheet2")
+
+### Based on these codes, change old codes into new ones
+
+MERGED_H1B2 <-  MERGED_H1B2 %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1051|15-1053", "15-1121")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1021|15-1022|15-1023", "15-1131")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1031", "15-1132")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1032|15-1036|15-1037", "15-1133")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "19-3021", "13-1161")) %>%
+      mutate(SOC_CODE = ifelse(SOC_CODE == "15-1179" & SOC_NAME == "COMPUTER NETWORK ARCHITECTS", "15-1143", SOC_CODE)) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1799|15-1179|15-1034|15-1052|15-1035|15-1099", "15-1199")) %>%      
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1071", "15-1142")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1061", "15-1141")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-1111", "29-1141")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1078|13-1079", "13-1071")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2144|17-2143", "17-2141")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2074|17-2073", "17-2071")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-2041", "25-2052")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-9799", "29-9099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-3999", "25-3099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1081", "15-1143")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "40-9743", "11-3021")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1011", "15-1111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2053", "17-2051")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "15-1041", "15-1151")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "17-2075|17-2076", "17-2072")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "41-3395", "11-3031")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "26-0850", "11-9041")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1073", "13-1151")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "26-6621", "11-9199")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "23-2092", "23-1012")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "26-3406", "11-9111")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-2043", "25-2054")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "25-2042", "25-2053")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "11-3042", "11-3131")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "42-4353", "11-3061")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "21-1798", "21-1099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "13-1072", "13-1141")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "29-2799", "29-2099")) %>%
+      mutate(SOC_CODE = str_replace(string = SOC_CODE, "26-0119", "11-9021"))
+      
+### Add official SOC_CODE dataset to the existing file
+### Get rid of observations where the SOC_CODE is still not recognized or has a problem
+### In total this is only 1380 observations removed out of more than 3.2 million
+
+ MERGED_H1B2 <- full_join(MERGED_H1B2, soc_official, by = c("SOC_CODE" = "SOC_CODE_O")) %>%
+      mutate(SOC_CODE_NOT_RECOG = ifelse(is.na(SOC_TITLE_O), 1, 0)) %>%
+      filter(SOC_CODE_NOT_RECOG == 0 & SOC_CODE_PROBLEM == 0) 
+ 
+``` 
+ 
+```{r}
+### Change Prevailing Wages that were incorrect (by finding manual conditions for each, where the prevailing wages seemed irrealistic)
+### Lose observations where it is unclear what the prevailing wage should be (only 2 such observations are filtered out)
+
+ MERGED_H1B3 <- MERGED_H1B2 %>%
+      mutate(PREVAILING_WAGE = as.numeric(PREVAILING_WAGE)) %>%
+      mutate(PW_UNIT_OF_PAY = ifelse(PW_UNIT_OF_PAY == "HOUR" & PREVAILING_WAGE > 2020, "YEAR", PW_UNIT_OF_PAY)) %>%
+      mutate(PW_UNIT_OF_PAY = ifelse(PW_UNIT_OF_PAY == "WEEK" & PREVAILING_WAGE > 20000, "YEAR", PW_UNIT_OF_PAY)) %>%
+      mutate(PW_UNIT_OF_PAY = ifelse(PW_UNIT_OF_PAY == "BI-WEEKLY" & PREVAILING_WAGE > 40000, "YEAR", PW_UNIT_OF_PAY)) %>%
+      mutate(PW_UNIT_OF_PAY = ifelse(PW_UNIT_OF_PAY == "MONTH" & PREVAILING_WAGE > 41500, "YEAR", PW_UNIT_OF_PAY)) %>%
+      mutate(PW_UNIT_OF_PAY = ifelse(PW_UNIT_OF_PAY == "MONTH" & PREVAILING_WAGE %in% c(31034, 33613, 37877, 39874, 40019, 40123), "YEAR", PW_UNIT_OF_PAY)) %>%
+      mutate(PREVAILING_WAGE = ifelse(PW_UNIT_OF_PAY == "YEAR" & PREVAILING_WAGE == 9062600, PREVAILING_WAGE/100, PREVAILING_WAGE)) %>%
+      mutate(PREVAILING_WAGE = ifelse(PW_UNIT_OF_PAY == "YEAR" & PREVAILING_WAGE %in% c(2710300, 996000, 752629, 711300, 710173, 650583, 627333, 472200), PREVAILING_WAGE/10, PREVAILING_WAGE)) %>%
+      mutate(PW_UNIT_OF_PAY = ifelse(PW_UNIT_OF_PAY == "YEAR" & PREVAILING_WAGE == 15467, "MONTH", PW_UNIT_OF_PAY)) %>%
+      mutate(PW_PROBLEM = ifelse(PW_UNIT_OF_PAY == "YEAR" & PREVAILING_WAGE == 745064, 1, ifelse(PW_UNIT_OF_PAY == "HOUR" & PREVAILING_WAGE == 2018, 1, 0))) %>%
+      filter(PW_PROBLEM == 0) %>%
+      filter(!is.na(PW_UNIT_OF_PAY))
+
+```
+
+```{r}
+### Remove columns that are no longer useful  
+
+MERGED_H1B3 <- MERGED_H1B3 %>%
+      select(-c(X1, SOC_CODE_PROBLEM, SOC_CODE_NOT_RECOG, PW_PROBLEM, SOC_NAME))
+
+### Change all wages (and prevailing wages) to be determined on a yearly level
+### Create new column called AVG_WAGE_RATE which is the mean of the WAGE_RATE_TO and WAGE_RATE_FROM if they both exist
+### Rearrange the columns' order with the select command
+
+time <- paste(c("HOUR", "WEEK", "BI-WEEKLY", "MONTH"), collapse = "|") 
+MERGED_H1B4 <- MERGED_H1B3 %>%
+      mutate(AVG_WAGE_RATE = ifelse(!is.na(WAGE_RATE_TO) , ((as.numeric(WAGE_RATE_FROM) + as.numeric(WAGE_RATE_TO)) / 2), as.numeric(WAGE_RATE_FROM))) %>%
+      mutate(PREVAILING_WAGE = as.numeric(PREVAILING_WAGE)) %>%
+      mutate(PREVAILING_WAGE = ifelse(PW_UNIT_OF_PAY == "HOUR", PREVAILING_WAGE * 2080, PREVAILING_WAGE)) %>%
+      mutate(PREVAILING_WAGE = ifelse(PW_UNIT_OF_PAY == "WEEK", PREVAILING_WAGE * 52, PREVAILING_WAGE)) %>%
+      mutate(PREVAILING_WAGE = ifelse(PW_UNIT_OF_PAY == "BI-WEEKLY", PREVAILING_WAGE * 26, PREVAILING_WAGE)) %>%
+      mutate(PREVAILING_WAGE = ifelse(PW_UNIT_OF_PAY == "MONTH", PREVAILING_WAGE * 12, PREVAILING_WAGE)) %>%
+      mutate(AVG_WAGE_RATE = ifelse(WAGE_UNIT_OF_PAY == "HOUR", AVG_WAGE_RATE * 2080, AVG_WAGE_RATE)) %>%
+      mutate(AVG_WAGE_RATE = ifelse(WAGE_UNIT_OF_PAY == "WEEK", AVG_WAGE_RATE * 52, AVG_WAGE_RATE)) %>%
+      mutate(AVG_WAGE_RATE = ifelse(WAGE_UNIT_OF_PAY == "BI-WEEKLY", AVG_WAGE_RATE * 26, AVG_WAGE_RATE)) %>%
+      mutate(AVG_WAGE_RATE = ifelse(WAGE_UNIT_OF_PAY == "MONTH", AVG_WAGE_RATE * 12, AVG_WAGE_RATE)) %>%
+      select(VISA_CLASS:WAGE_RATE_TO, AVG_WAGE_RATE, WAGE_UNIT_OF_PAY, PREVAILING_WAGE, FULL_TIME_POS:SOC_TITLE_O) 
+
+all_year_pw <- str_replace_all(MERGED_H1B4$PW_UNIT_OF_PAY, time , "YEAR") 
+all_year_wage <- str_replace_all(MERGED_H1B4$WAGE_UNIT_OF_PAY, time , "YEAR") 
+
+MERGED_H1B4 <- MERGED_H1B4 %>%
+      mutate(PW_UNIT_OF_PAY = all_year_pw,
+             WAGE_UNIT_OF_PAY = all_year_wage) %>%
+      filter(WAGE_UNIT_OF_PAY == "YEAR")
+
+```     
+
+
+```{r}
+### Find the standard deviation of the prevailing wage
+
+StandardDevSummary <- MERGED_H1B4 %>%
+      select(WAGE_UNIT_OF_PAY, PREVAILING_WAGE, AVG_WAGE_RATE) %>%
+      group_by(WAGE_UNIT_OF_PAY) %>%
+      summarise(Std_PW = sd(PREVAILING_WAGE), Std_Wage = sd(AVG_WAGE_RATE))
+
+sd_pw <- StandardDevSummary[[1,2]]
+
+### Use above statistic to filter out observations where the wage rate is outside of 3 standard deviations of the prevailing wage 
+### We lose 678 observations, which are probably coded wrongly
+
+MERGED_H1B4 <- MERGED_H1B4 %>%
+      mutate(Within3sd_AVG_WAGE_RATE = ifelse(AVG_WAGE_RATE > (PREVAILING_WAGE - 3*sd_pw) & AVG_WAGE_RATE < (PREVAILING_WAGE + 3*sd_pw), 1, 0)) %>%
+      filter(Within3sd_AVG_WAGE_RATE != 0) 
+
+### Remove columns that are no longer necessary
+
+MERGED_H1B4 <- MERGED_H1B4 %>%
+      select(-c(WAGE_RATE_FROM, WAGE_RATE_TO, WAGE_UNIT_OF_PAY, PW_UNIT_OF_PAY, NAICS_CODE, Within3sd_AVG_WAGE_RATE, TOTAL_WORKERS))
+```     
+
+
+```{r} 
+### Additional changes we noticed while working with the file
+
+### Make worksite city more readable
+
+MERGED_H1B4$WORKSITE_CITY <- trimws(MERGED_H1B4$WORKSITE_CITY)
+punct_city <- paste(c(",", "\"", "[:digit:]", collapse = "|"))
+remove_punct <- str_replace_all(MERGED_H1B4$WORKSITE_CITY, punct_city, "")
+
+### Create a new coloumn just containing the first two digits of the SOC Code, as this will show the 23 categories of occupations
+
+MERGED_H1B4 <- MERGED_H1B4 %>%
+      mutate(TWO_DIGIT_SOC = str_extract_all(SOC_CODE, pattern = "^\\d{2}")) %>%
+      mutate(TWO_DIGIT_SOC = as.character(TWO_DIGIT_SOC)) %>%
+      mutate(WORKSITE_CITY = remove_punct)
+      
+### Change States' names from codes to full names
+
+full_states_name <- as.data.frame(fread("/home/stat041s18_h1b/StatesAbbr.csv"))
+MERGED_H1B4 <- inner_join(MERGED_H1B4, full_states_name, by = c("WORKSITE_STATE" = "StateShort")) %>%
+      select(-WORKSITE_STATE) 
+
+### Add column with job category strings describing two digit codes 
+
+OTitle <- c("Management", 
+            "Business and Financial Operations", 
+            "Computer and Mathematical", 
+            "Architecture and Engineering",
+            "Life, Physical, and Social Science",
+            "Community and Social Service",
+            "Legal",
+            "Education, Training, and Library",
+            "Arts, Design, Entertainment, Sports, and Media",
+            "Healthcare Practitioners and Technical",
+            "Healthcare Support",
+            "Protective Service",
+            "Food Preparation and Serving Related",
+            "Building and Grounds Cleaning and Maintenance",
+            "Personal Care and Service",
+            "Sales and Related",
+            "Office and Administrative Support",
+            "Farming, Fishing, and Forestry",
+            "Construction and Extraction",
+            "Installation, Maintenance, and Repair",
+            "Production",
+            "Transportation and Material Moving",
+            "Military Specific")
+
+ONumber <- c("11", "13", "15", "17", "19", "21", "23", "25", "27", "29", "31", "33", "35", "37", "39", "41", "43", "45", "47", "49", "51", "53", "55")
+
+OMerged <- data.frame(OTitle, ONumber) %>%
+      mutate(ONumber = as.character(ONumber))
+
+MERGED_H1B5 <- MERGED_H1B4 %>%
+      inner_join(OMerged, by = c("TWO_DIGIT_SOC" = "ONumber")) %>%
+      mutate(TWO_DIGIT_SOC = as.factor(TWO_DIGIT_SOC))
+
+### Create new column just with Year 
+
+MERGED_H1B5 <- MERGED_H1B5 %>%
+      mutate(EMPLOYMENT_START_DATE = as.Date(EMPLOYMENT_START_DATE)) %>%
+      mutate(Year = year(EMPLOYMENT_START_DATE))
+
+### Remove observations with NA values for some columns (5 such observations removed)
+
+MERGED_H1B5 <- MERGED_H1B5 %>%
+      filter(!is.na(EMPLOYER_NAME)) %>%
+      filter(!is.na(JOB_TITLE)) %>%
+      filter(!is.na(WORKSITE_CITY)) 
+
+### Remove FullTimePosition, because in some years it is wrongly coded and other variables we decided not to use
+
+MERGED_H1B5 <- MERGED_H1B5 %>%
+      select(-c(FULL_TIME_POS, WORKSITE_POSTAL_CODE, WORKSITE_COUNTY))
+
+### Export this file, to be used by our app
+
+write.csv(MERGED_H1B5, file = "/home/stat041s18_h1b/WranglingCompleteNew.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
